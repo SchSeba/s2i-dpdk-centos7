@@ -3,6 +3,12 @@
 
 ## Getting started  
 
+### Run a s2i build
+
+```bash
+s2i build test/test-app/ quay.io/schseba/dpdk-centos7 sample-app
+```
+
 ### Files and Directories  
 | File                   | Required? | Description                                                  |
 |------------------------|-----------|--------------------------------------------------------------|
@@ -42,7 +48,7 @@ Make sure that all of the scripts are executable by running *chmod +x s2i/bin/**
 #### Create the builder image
 The following command will create a builder image named dpdk-centos7 based on the Dockerfile that was created previously.
 ```
-docker build -t dpdk-centos7 .
+docker build -t quay.io/schseba/dpdk-centos7 .
 ```
 The builder image can also be created by using the *make* command since a *Makefile* is included.
 
@@ -60,24 +66,7 @@ The builder image can also be tested by using the *make test* command since a *M
 The application image combines the builder image with your applications source code, which is served using whatever application is installed via the *Dockerfile*, compiled using the *assemble* script, and run using the *run* script.
 The following command will create the application image:
 ```
-s2i build test/test-app dpdk-centos7 dpdk-centos7-app
+s2i build test/test-app quay.io/schseba/dpdk-centos7 dpdk-centos7-app
 ---> Building and installing application from source...
 ```
 Using the logic defined in the *assemble* script, s2i will now create an application image using the builder image as a base and including the source code from the test/test-app directory. 
-
-#### Running the application image
-Running the application image is as simple as invoking the docker run command:
-```
-docker run -d -p 8080:8080 dpdk-centos7-app
-```
-The application, which consists of a simple static web page, should now be accessible at  [http://localhost:8080](http://localhost:8080).
-
-#### Using the saved artifacts script
-Rebuilding the application using the saved artifacts can be accomplished using the following command:
-```
-s2i build --incremental=true test/test-app nginx-centos7 nginx-app
----> Restoring build artifacts...
----> Building and installing application from source...
-```
-This will run the *save-artifacts* script which includes the custom code to backup the currently running application source, rebuild the application image, and then re-deploy the previously saved source using the *assemble* script.
-# s2i-dpdk-centos7
