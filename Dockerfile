@@ -14,7 +14,7 @@ LABEL io.k8s.description="Platform for building DPDK workloads" \
       io.openshift.tags="builder,dpdk"
 
 RUN yum groupinstall -y "Development Tools"
-RUN yum install --skip-broken -y wget numactl numactl-devel make libibverbs-devel logrotate rdma-core ethtool && yum clean all
+RUN yum install --skip-broken -y wget numactl numactl-devel make libibverbs-devel logrotate rdma-core ethtool git libpcap-devel patch which readline-devel && yum clean all
 # Download and compile DPDK
 
 WORKDIR /usr/src/
@@ -34,6 +34,12 @@ RUN make install T=${RTE_TARGET} DESTDIR=${RTE_SDK}
 #
 WORKDIR ${DPDK_DIR}/app/test-pmd
 RUN make && cp testpmd /usr/bin/testpmd
+
+WORKDIR /usr/src/
+RUN wget http://www.lua.org/ftp/lua-5.3.4.tar.gz
+RUN tar xzvf lua-5.3.4.tar.gz
+
+RUN cd ./lua-5.3.4 && make linux && make install
 
 WORKDIR /opt/app-root/src
 
