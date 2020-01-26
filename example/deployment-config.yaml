@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/component: s2i-dpdk-centos7
     app.kubernetes.io/instance: s2i-dpdk-centos7
   name: s2i-dpdk-centos7-testpmd
-  namespace: dpdk
+  namespace: dpdk-testing
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -27,7 +27,7 @@ spec:
       labels:
         deploymentconfig: s2i-dpdk-centos7
       annotations:
-        k8s.v1.cni.cncf.io/networks: dpdk/sriov-network-dpdk
+        k8s.v1.cni.cncf.io/networks: dpdk-testing/dpdk-network
     spec:
       serviceAccount: deployer
       serviceAccountName: deployer

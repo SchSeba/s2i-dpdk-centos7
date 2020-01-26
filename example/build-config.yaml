@@ -1,3 +1,11 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: s2i-dpdk-centos7
+  namespace: dpdk-testing
+spec: {}
+---
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
@@ -6,7 +14,7 @@ metadata:
     app.kubernetes.io/component: s2i-dpdk-centos7
     app.kubernetes.io/instance: s2i-dpdk-centos7
   name: s2i-dpdk-centos7
-  namespace: dpdk
+  namespace: dpdk-testing
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: null
