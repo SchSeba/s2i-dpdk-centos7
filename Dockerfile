@@ -1,7 +1,10 @@
 # dpdk-centos7
-FROM openshift/base-centos7
+#FROM openshift/base-centos7
+FROM centos:7
 
 LABEL maintainer="Sebastian Scheinkman <sebassch@gmail.com>"
+LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+LABEL io.s2i.scripts-url="image:///usr/libexec/s2i"
 
 ENV BUILDER_VERSION 0.1
 ENV DPDK_VER 19.11
@@ -14,7 +17,7 @@ LABEL io.k8s.description="Platform for building DPDK workloads" \
       io.openshift.tags="builder,dpdk"
 
 RUN yum groupinstall -y "Development Tools"
-RUN yum install --skip-broken -y wget numactl numactl-devel make libibverbs-devel logrotate rdma-core ethtool git libpcap-devel patch which readline-devel && yum clean all
+RUN yum install -y wget numactl numactl-devel make libibverbs-devel logrotate rdma-core ethtool git libpcap-devel patch which readline-devel && yum clean all
 # Download and compile DPDK
 
 WORKDIR /usr/src/
