@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-git clone http://dpdk.org/git/apps/pktgen-dpdk
+#git clone http://dpdk.org/git/apps/pktgen-dpdk
+git clone https://github.com/pktgen/Pktgen-DPDK.git
 # shellcheck disable=SC2164
 cd ./pktgen-dpdk
 
