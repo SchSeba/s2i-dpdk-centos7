@@ -1,6 +1,6 @@
 # dpdk-centos7
-#FROM openshift/base-centos7
-FROM centos:7
+FROM openshift/base-centos7
+#FROM centos:7
 
 LABEL maintainer="Sebastian Scheinkman <sebassch@gmail.com>"
 LABEL io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
@@ -17,7 +17,24 @@ LABEL io.k8s.description="Platform for building DPDK workloads" \
       io.openshift.tags="builder,dpdk"
 
 RUN yum groupinstall -y "Development Tools"
-RUN yum install -y wget numactl numactl-devel make libibverbs-devel logrotate rdma-core ethtool git libpcap-devel patch which readline-devel && yum clean all
+RUN yum install -y wget \
+ numactl \
+ numactl-devel \
+ make \
+ libibverbs-devel \
+ logrotate \
+ rdma-core \
+ ethtool \
+ libpcap-devel \
+ patch \
+ which \
+ readline-devel \
+ iproute \
+ libibverbs \
+ libmlx5 \
+ lua \
+ git \
+ gcc && yum clean all
 # Download and compile DPDK
 
 WORKDIR /usr/src/
@@ -45,6 +62,8 @@ RUN tar xzvf lua-5.3.4.tar.gz
 RUN cd ./lua-5.3.4 && make linux && make install
 
 WORKDIR /opt/app-root/src
+
+RUN chmod -R 777 /opt/app-root
 
 # TODO: Copy the S2I scripts to /usr/libexec/s2i, since openshift/base-centos7 image
 # sets io.openshift.s2i.scripts-url label that way, or update that label
