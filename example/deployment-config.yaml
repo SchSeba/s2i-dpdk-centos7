@@ -2,19 +2,17 @@ apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
   labels:
-    app: s2i-dpdk-centos7
-    app.kubernetes.io/component: s2i-dpdk-centos7
-    app.kubernetes.io/instance: s2i-dpdk-centos7
-  name: s2i-dpdk-centos7-testpmd
+    app: s2i-dpdk-app
+    app.kubernetes.io/component: s2i-dpdk-app
+    app.kubernetes.io/instance: s2i-dpdk-app
+  name: s2i-dpdk-app
   namespace: dpdk-testing
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    deploymentconfig: s2i-dpdk-centos7
+    deploymentconfig: s2i-dpdk-app
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
     rollingParams:
       intervalSeconds: 1
       maxSurge: 25%
@@ -25,54 +23,52 @@ spec:
   template:
     metadata:
       labels:
-        deploymentconfig: s2i-dpdk-centos7
+        deploymentconfig: s2i-dpdk-app
       annotations:
         k8s.v1.cni.cncf.io/networks: dpdk-testing/dpdk-network
     spec:
       serviceAccount: deployer
       serviceAccountName: deployer
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/dpdk/s2i-dpdk-centos7
+        - image: image-registry.openshift-image-registry.svc:5000/dpdk-testing/s2i-dpdk-app
           securityContext:
             capabilities:
-              add: ["IPC_LOCK","NET_ADMIN","NET_RAW"]
+              add: ["IPC_LOCK","SYS_RESOURCE"]
           imagePullPolicy: Always
-          env:
-            - name: RUN_TYPE
-              value: "testpmd"
-          name: s2i-dpdk-centos7
+          # TODO: Enable this
+          #          env:
+          #            - name: RUN_TYPE
+          #              value: "testpmd"
+          name: s2i-dpdk-app
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           resources:
             limits:
               cpu: "4"
-              hugepages-1Gi: 8Gi
+              hugepages-1Gi: 4Gi
               memory: 1000Mi
             requests:
               cpu: "4"
-              hugepages-1Gi: 8Gi
+              hugepages-1Gi: 4Gi
               memory: 1000Mi
           volumeMounts:
             - mountPath: /mnt/huge
               name: hugepage
       dnsPolicy: ClusterFirst
       volumes:
-      - name: hugepage
-        emptyDir:
-          medium: HugePages
+        - name: hugepage
+          emptyDir:
+            medium: HugePages
       restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
   test: false
   triggers:
     - type: ConfigChange
     - imageChangeParams:
         automatic: true
         containerNames:
-          - s2i-dpdk-centos7
+          - s2i-dpdk-app
         from:
           kind: ImageStreamTag
-          name: s2i-dpdk-centos7:latest
-          namespace: dpdk
+          name: s2i-dpdk-app:latest
+          namespace: dpdk-testing
       type: ImageChange

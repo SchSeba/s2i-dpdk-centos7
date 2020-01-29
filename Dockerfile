@@ -31,7 +31,6 @@ RUN yum install -y wget \
  readline-devel \
  iproute \
  libibverbs \
- libmlx5 \
  lua \
  git \
  gcc && yum clean all
@@ -48,6 +47,11 @@ RUN sed -i -e 's/KNI_KMOD=y/KNI_KMOD=n/' config/common_linux
 RUN sed -i -e 's/LIBRTE_KNI=y/LIBRTE_KNI=n/' config/common_linux
 RUN sed -i -e 's/LIBRTE_PMD_KNI=y/LIBRTE_PMD_KNI=n/' config/common_linux
 RUN sed -i 's/\(CONFIG_RTE_LIBRTE_MLX5_PMD=\)n/\1y/g' $DPDK_DIR/config/common_base
+
+# Build the dpdk package with a different machine arch
+RUN cp config/defconfig_x86_64-native-linuxapp-gcc config/defconfig_x86_64-hsw-linuxapp-gcc
+RUN sed -i -e 's/CONFIG_RTE_MACHINE="native"/CONFIG_RTE_MACHINE="hsw"/' config/defconfig_x86_64-hsw-linuxapp-gcc
+
 RUN make install T=${RTE_TARGET} DESTDIR=${RTE_SDK}
 #
 # Build TestPmd
@@ -68,5 +72,8 @@ RUN chmod -R 777 /opt/app-root
 # TODO: Copy the S2I scripts to /usr/libexec/s2i, since openshift/base-centos7 image
 # sets io.openshift.s2i.scripts-url label that way, or update that label
 COPY ./s2i/bin/ /usr/libexec/s2i
+
+RUN setcap cap_ipc_lock=+ep /usr/libexec/s2i/run \
+    && setcap cap_sys_resource=+ep /usr/libexec/s2i/run
 
 CMD ["/usr/libexec/s2i/usage"]

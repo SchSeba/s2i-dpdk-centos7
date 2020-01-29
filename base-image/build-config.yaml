@@ -2,7 +2,7 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: s2i-dpdk-app
+  name: dpdk-s2i-base
   namespace: dpdk-testing
 spec: {}
 ---
@@ -10,31 +10,31 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    app: s2i-dpdk
-    app.kubernetes.io/component: s2i-dpdk
-    app.kubernetes.io/instance: s2i-dpdk
-  name: s2i-dpdk
+    app: dpdk-base
+    app.kubernetes.io/component: dpdk-base
+    app.kubernetes.io/instance: dpdk-base
+  name: dpdk-base
   namespace: dpdk-testing
 spec:
   failedBuildsHistoryLimit: 5
-  nodeSelector: null
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
   output:
     to:
       kind: ImageStreamTag
-      name: s2i-dpdk-app:latest
+      name: dpdk-s2i-base:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
   source:
-    contextDir: test/test-app
     git:
       uri: https://github.com/SchSeba/s2i-dpdk-centos7.git
     type: Git
   strategy:
-    sourceStrategy:
+    dockerStrategy:
       from:
-        kind: DockerImage
-        name: quay.io/schseba/dpdk-s2i-base:latest
+        kind: "DockerImage"
+        name: "openshift/base-centos7"
     type: Source
   successfulBuildsHistoryLimit: 5
   triggers:
