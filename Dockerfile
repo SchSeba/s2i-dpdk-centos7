@@ -73,7 +73,6 @@ RUN chmod -R 777 /opt/app-root
 # sets io.openshift.s2i.scripts-url label that way, or update that label
 COPY ./s2i/bin/ /usr/libexec/s2i
 
-RUN setcap cap_ipc_lock=+ep /usr/libexec/s2i/run \
-    && setcap cap_sys_resource=+ep /usr/libexec/s2i/run
+RUN setcap cap_sys_resource,cap_ipc_lock=+ep /usr/libexec/s2i/run
 
 CMD ["/usr/libexec/s2i/usage"]
